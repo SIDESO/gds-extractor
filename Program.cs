@@ -137,6 +137,8 @@ namespace GDSExtractor
             clientRef.Value = client;
 
 
+
+
             client.Connect();
 
             countdown.Wait();
