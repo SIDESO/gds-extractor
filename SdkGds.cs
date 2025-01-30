@@ -82,10 +82,15 @@ namespace GDSExtractor
             {
                 if (data.Status != StatusCode.OK)
                 {
-                    Console.WriteLine("Select failed!");
-                    Console.WriteLine(string.Format("Status: {0}, Reason: {1}", data.Status, data.Exception));
-                    client.Value.Close();
-                    countdown.Signal();
+                    this.formGds.Invoke((MethodInvoker)delegate
+                    {
+                        var message = string.Format("Status: {0}, Reason: {1}", data.Status, data.Exception);
+                        this.formGds.infoConection.Text = message;
+
+                    });
+                   
+                   // client.Value.Close();
+                  //  countdown.Signal();
                     return;
                 }
 

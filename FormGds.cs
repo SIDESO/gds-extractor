@@ -66,16 +66,7 @@ namespace GDSExtractor
 
             ValidateParamsAndBoot();
 
-            var user = "simut";
-            //es de tipo secureString
-            var pass = "SystemSimut2024";
-
-            var securePass = new System.Security.SecureString();
-
-            foreach (char c in pass)
-            {
-                securePass.AppendChar(c);
-            }
+         
 
 
             Reference<AsyncGDSClient> clientRef = new Reference<AsyncGDSClient>(null);
@@ -83,8 +74,7 @@ namespace GDSExtractor
             AsyncGDSClient client = AsyncGDSClient.GetBuilder()
                 .WithListener(listener)
                 .WithTimeout(10000)
-                .WithUserName(user)
-                .WithUserPassword(securePass)
+                 .WithUserName("transito_app")
                 .WithPingPongInterval(10000)
                 .Build();
             clientRef.Value = client;
