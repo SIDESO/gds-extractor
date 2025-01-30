@@ -14,23 +14,26 @@ namespace GDSExtractor
         [JsonProperty("id")]
         public string id { get; set; }
 
-        [JsonProperty("plate")]
-        public string plate { get; set; }
+        [JsonProperty("license_plate")]
+        public string license_plate { get; set; }
 
-        [JsonConverter(typeof(DateTimeConverter)), JsonProperty("date")]
-        public DateTime date { get; set; }
+        [JsonProperty("date")]
+        public string date { get; set; }
 
         [JsonProperty("max_speed")]
         public string max_speed { get; set; }
         
 
-        [JsonProperty("camera")]
-        public string camera { get; set; }
+        [JsonProperty("camera_serial")]
+        public string camera_serial { get; set; }
+
+        [JsonProperty("data")]
+        public string data { get; set; }
 
         [property: JsonIgnore]
         public string resultado { get; set; }
 
-        public string dateStr => date.ToString("dd/MM/yyyy HH:mm");
+       
 
 
 
