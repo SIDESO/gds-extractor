@@ -192,9 +192,10 @@ namespace GDSExtractor
 
                 //Los adjuntos se solicitan por separado estan el poción de 9 en foma de array
                 //tambien parecen ser 3,tambien en la 91
+                //viene como object
                 
-                string[] adjuntos = (string[])record[91];
-                
+                object[] adjuntos = record[91] as object[];
+
 
 
                 //Los adjuntos se solicitan por separado estan el poción de 72 en foma de array
