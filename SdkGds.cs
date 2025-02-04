@@ -243,7 +243,7 @@ namespace GDSExtractor
                                 var message = "Getting Attahcments .." + adjuntoId + " " + messageID;
 
                             });
-                            getAttachment(adjuntoId, messageID);
+                            getAttachment(dei.id, messageID);
                         }
                     }
 
