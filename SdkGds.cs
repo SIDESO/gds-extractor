@@ -192,8 +192,9 @@ namespace GDSExtractor
 
                 //Los adjuntos se solicitan por separado estan el poción de 9 en foma de array
                 //tambien parecen ser 3,tambien en la 91
-
-                var adjuntos = record[91] as List<object>;
+                
+                string[] adjuntos = (string[])record[91];
+                
 
 
                 //Los adjuntos se solicitan por separado estan el poción de 72 en foma de array
@@ -216,7 +217,7 @@ namespace GDSExtractor
                     camera_serial = record[119]?.ToString(), //entry_device_id
                     resultado = "OK",
                     data=messageID,
-                    attachments = JsonConvert.SerializeObject(adjuntos)
+                    attachments = JsonConvert.SerializeObject(record[91])
 
                 };
 
