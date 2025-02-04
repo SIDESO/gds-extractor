@@ -1,4 +1,6 @@
-﻿namespace GDSExtractor
+﻿using System.Windows.Forms;
+
+namespace GDSExtractor
 {
     partial class FormGds
     {
@@ -44,7 +46,7 @@
             panel1.Controls.Add(userLabel);
             panel1.Location = new Point(7, 3);
             panel1.Name = "panel1";
-            panel1.Size = new Size(1172, 89);
+            panel1.Size = new Size(1385, 89);
             panel1.TabIndex = 0;
             // 
             // infoConection
@@ -71,26 +73,29 @@
             // 
             // dataGridDeis
             // 
+            dataGridDeis.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
+            dataGridDeis.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
             dataGridDeis.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dataGridDeis.Location = new Point(3, 3);
             dataGridDeis.Name = "dataGridDeis";
             dataGridDeis.RowHeadersWidth = 51;
-            dataGridDeis.Size = new Size(1161, 309);
+            dataGridDeis.Size = new Size(1374, 512);
             dataGridDeis.TabIndex = 0;
+            
             // 
             // panel2
             // 
             panel2.Controls.Add(dataGridDeis);
             panel2.Location = new Point(12, 98);
             panel2.Name = "panel2";
-            panel2.Size = new Size(1167, 315);
+            panel2.Size = new Size(1380, 518);
             panel2.TabIndex = 1;
             // 
             // FormGds
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1191, 450);
+            ClientSize = new Size(1404, 628);
             Controls.Add(panel2);
             Controls.Add(panel1);
             Name = "FormGds";

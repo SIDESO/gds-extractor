@@ -189,34 +189,30 @@ namespace GDSExtractor
                 //darle un uuid para el mensaje
                 string messageID = Guid.NewGuid().ToString();
 
+                //Los adjuntos se solicitan por separado estan el poción de 9 en foma de array
+                //tambien parecen ser 3,tambien en la 91
+
+                var adjuntos = record[91] as List<object>;
+
+
                 //Los adjuntos se solicitan por separado estan el poción de 72 en foma de array
 
-                var adjuntos = record[72] as List<object>;
-
-
-                if (adjuntos != null) {
-                    foreach (var adjunto in adjuntos)
-                    {
-                        var adjuntoId = adjunto.ToString();
-                        this.formGds.Invoke((MethodInvoker)delegate
-                        {
-                            var message = "Getting Attahcments .." + adjuntoId + " " + messageID;
-                            this.formGds.labelInfoRow.Text = message;
-                        });
-                        getAttachment(adjuntoId, messageID);
-                    }
-                }
+                //fecha 5
+                //id 71
+                //placa 98
+                //velocida  121
+                //camara 119
 
 
 
                 //crear la data que se va a enviar a transito app
                 Dei dei = new Dei
                 {
-                    id = record[73].ToString(),
-                    license_plate = record[63].ToString(), //plate
-                    max_speed = record[18].ToString(), //average_speed
-                    date = record[2].ToString(),
-                    camera_serial = record[32].ToString(), //entry_device_id
+                    id = record[71].ToString(),
+                    license_plate = record[98].ToString(), //plate
+                    max_speed = record[121].ToString(), //average_speed
+                    date = record[5].ToString(),
+                    camera_serial = record[119].ToString(), //entry_device_id
                     resultado = "OK",
                     data=messageID
 
@@ -232,7 +228,23 @@ namespace GDSExtractor
                 {
                    int index =  this.formGds.dataGridDeis.Rows.Add(dei.id, dei.license_plate, dei.date, dei.max_speed, dei.license_plate, dei.resultado, messageID);
 
-                   getAttachment(dei.id, messageID);
+
+
+                    if (adjuntos != null)
+                    {
+                        foreach (var adjunto in adjuntos)
+                        {
+                            var adjuntoId = adjunto.ToString();
+                            this.formGds.Invoke((MethodInvoker)delegate
+                            {
+                                var message = "Getting Attahcments .." + adjuntoId + " " + messageID;
+
+                            });
+                            getAttachment(adjuntoId, messageID);
+                        }
+                    }
+
+                   // getAttachment(dei.id, messageID);
 
 
                     

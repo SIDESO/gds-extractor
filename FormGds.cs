@@ -78,7 +78,7 @@ namespace GDSExtractor
                 {
                     Directory.CreateDirectory(path);
                 }
-            
+
             }
             catch (Exception e)
             {
@@ -166,11 +166,6 @@ namespace GDSExtractor
 
             return httpClient;
         }
-
-
-
-
-        
 
 
     }
