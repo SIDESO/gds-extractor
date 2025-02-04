@@ -138,13 +138,14 @@ namespace GDSExtractor
                 this.userLabel.Text = paramsCollection["userName"];
 
                 //agregar las columnas al datagrid
-                this.dataGridDeis.Columns.Add("id", "ID");
+                this.dataGridDeis.Columns.Add("id", "ID del evento");
                 this.dataGridDeis.Columns.Add("plate", "Placa");
                 this.dataGridDeis.Columns.Add("date", "Fecha");
                 this.dataGridDeis.Columns.Add("max_speed", "Velocidad");
                 this.dataGridDeis.Columns.Add("camera", "Camara");
                 this.dataGridDeis.Columns.Add("resultado", "Resultado");
                 this.dataGridDeis.Columns.Add("msg_id", "uuuid mensaje");
+                this.dataGridDeis.Columns.Add("attachments", "Adjuntos");
 
 
             }

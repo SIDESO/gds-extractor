@@ -8,6 +8,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Text;
 using Newtonsoft.Json;
 using Microsoft.VisualBasic.ApplicationServices;
+using System.Net.Mail;
 
 namespace GDSExtractor
 {
@@ -214,7 +215,8 @@ namespace GDSExtractor
                     date = record[5]?.ToString(),
                     camera_serial = record[119]?.ToString(), //entry_device_id
                     resultado = "OK",
-                    data=messageID
+                    data=messageID,
+                    attachments = JsonConvert.SerializeObject(adjuntos)
 
                 };
 
@@ -226,8 +228,7 @@ namespace GDSExtractor
                 //se agrega a la lista de deis  en la tabla de la interfaz
                 this.formGds.Invoke((MethodInvoker)delegate
                 {
-                   int index =  this.formGds.dataGridDeis.Rows.Add(dei.id, dei.license_plate, dei.date, dei.max_speed, dei.license_plate, dei.resultado, messageID);
-
+                   int index =  this.formGds.dataGridDeis.Rows.Add(dei.id, dei.license_plate, dei.date, dei.max_speed, dei.license_plate, dei.resultado, messageID, dei.attachments);
 
 
                     if (adjuntos != null)

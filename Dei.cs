@@ -33,12 +33,15 @@ namespace GDSExtractor
         [property: JsonIgnore]
         public string resultado { get; set; }
 
-       
+        [JsonProperty("attachments")]
+        public string attachments { get; set; }
 
 
 
 
-       
+
+
+
         public string json()
         {
             return JsonConvert.SerializeObject(this);
