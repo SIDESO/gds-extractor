@@ -208,11 +208,11 @@ namespace GDSExtractor
                 //crear la data que se va a enviar a transito app
                 Dei dei = new Dei
                 {
-                    id = record[71].ToString(),
-                    license_plate = record[98].ToString(), //plate
-                    max_speed = record[121].ToString(), //average_speed
-                    date = record[5].ToString(),
-                    camera_serial = record[119].ToString(), //entry_device_id
+                    id = record[71]?.ToString(),
+                    license_plate = record[98]?.ToString(), //plate
+                    max_speed = record[121]?.ToString(), //average_speed
+                    date = record[5]?.ToString(),
+                    camera_serial = record[119]?.ToString(), //entry_device_id
                     resultado = "OK",
                     data=messageID
 
