@@ -66,7 +66,25 @@ namespace GDSExtractor
 
             ValidateParamsAndBoot();
 
-         
+
+            //crear el directorio de imagenes
+            // Specify the directory you want to manipulate.
+            string path = @"c:\images_gds";
+
+            try
+            {
+                // Determine whether the directory exists.
+                if (!Directory.Exists(path))
+                {
+                    Directory.CreateDirectory(path);
+                }
+            
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("The process failed: {0}", e.ToString());
+
+            }
 
 
             Reference<AsyncGDSClient> clientRef = new Reference<AsyncGDSClient>(null);
@@ -74,7 +92,7 @@ namespace GDSExtractor
             AsyncGDSClient client = AsyncGDSClient.GetBuilder()
                 .WithListener(listener)
                 .WithTimeout(10000)
-                 .WithUserName("transito_app")
+                 .WithUserName("admin")
                 .WithPingPongInterval(10000)
                 .Build();
             clientRef.Value = client;

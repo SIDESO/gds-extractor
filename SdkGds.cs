@@ -154,7 +154,7 @@ namespace GDSExtractor
                 if (attachment != null)
                 {
                     //descargar el archivo
-                    string path = Path.Combine("C:\\Users\\Usuario\\Desktop\\", messageID + ".jpg");
+                    string path = Path.Combine("C:\\images_gds\\", messageID + ".jpg");
 
 
                     File.WriteAllBytes(path, attachment);
@@ -189,11 +189,30 @@ namespace GDSExtractor
                 //darle un uuid para el mensaje
                 string messageID = Guid.NewGuid().ToString();
 
+                //Los adjuntos se solicitan por separado estan el poción de 72 en foma de array
+
+                var adjuntos = record[72] as List<object>;
+
+
+                if (adjuntos != null) {
+                    foreach (var adjunto in adjuntos)
+                    {
+                        var adjuntoId = adjunto.ToString();
+                        this.formGds.Invoke((MethodInvoker)delegate
+                        {
+                            var message = "Getting Attahcments .." + adjuntoId + " " + messageID;
+                            this.formGds.labelInfoRow.Text = message;
+                        });
+                        getAttachment(adjuntoId, messageID);
+                    }
+                }
+
+
 
                 //crear la data que se va a enviar a transito app
                 Dei dei = new Dei
                 {
-                    id = record[0].ToString(),
+                    id = record[73].ToString(),
                     license_plate = record[63].ToString(), //plate
                     max_speed = record[18].ToString(), //average_speed
                     date = record[2].ToString(),
