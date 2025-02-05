@@ -1,23 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Reflection.Metadata;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web;
-using System.Windows.Forms;
-using Gds.Messages.Data;
-using Gds.Messages.Header;
-using Gds.Messages;
-using Gds.Utils;
+﻿using System.Web;
 using messages.Gds.Websocket;
-using System.Runtime.CompilerServices;
-using System.Net;
 using static GDSExtractor.SdkGds;
-using Newtonsoft.Json;
 
 namespace GDSExtractor
 {
@@ -31,6 +14,7 @@ namespace GDSExtractor
         string issuerName;
         string command;
         string url;
+        private TestListener listener;
 
         //get endpoint
         public string getEndpoint()
@@ -88,14 +72,16 @@ namespace GDSExtractor
 
 
             Reference<AsyncGDSClient> clientRef = new Reference<AsyncGDSClient>(null);
-            TestListener listener = new TestListener(clientRef, this);
+            listener = new TestListener(clientRef, this);
             AsyncGDSClient client = AsyncGDSClient.GetBuilder()
                 .WithListener(listener)
                 .WithTimeout(10000)
-                 .WithUserName("admin")
+                .WithUserName("developer")
+                .WithURI("ws://127.0.0.1:8888/gate")
                 .WithPingPongInterval(10000)
                 .Build();
             clientRef.Value = client;
+
             client.Connect();
 
             //countdown.Wait();
@@ -166,6 +152,43 @@ namespace GDSExtractor
             httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Accept", "application/json");
 
             return httpClient;
+        }
+
+        private void buttonGetEvents_Click(object sender, EventArgs e)
+        {
+            int limit = 0;
+
+
+            if (this.textBoxLimit.Text == null || this.textBoxLimit.Text == String.Empty)
+            {
+                limit = 10;
+            }
+
+            //sttart date
+            if (this.dateTimeStartDate.Value == null)
+            {
+                MessageBox.Show("Debe seleccionar una fecha de inicio", "Error");
+                return;
+            }
+
+            string start_date = this.dateTimeStartDate.CustomFormat = "yyyy-MM-dd HH:mm:ss";
+
+
+            //end date
+            if (this.dateTimeEndDate.Value == null)
+            {
+                MessageBox.Show("Debe seleccionar una fecha de fin", "Error");
+                return;
+            }
+
+            string end_date = this.dateTimeEndDate.CustomFormat = "yyyy-MM-dd HH:mm:ss";
+
+            string msg = this.listener.GetEvents(start_date, end_date, limit);
+
+            this.labelReposnseBtnGetEvents.Text = msg;
+
+
+
         }
 
 

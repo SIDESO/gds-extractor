@@ -1,14 +1,10 @@
-﻿using Gds.Messages.Data;
-using Gds.Messages.Header;
+﻿using System.Text;
 using Gds.Messages;
+using Gds.Messages.Data;
+using Gds.Messages.Header;
 using Gds.Utils;
 using messages.Gds.Websocket;
-using System.Security;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using System.Text;
 using Newtonsoft.Json;
-using Microsoft.VisualBasic.ApplicationServices;
-using System.Net.Mail;
 
 namespace GDSExtractor
 {
@@ -46,13 +42,11 @@ namespace GDSExtractor
 
                 this.formGds.Invoke((MethodInvoker)delegate
                 {
-                    this.formGds.infoConection.Text = "Cliente conectado, enviando query";
+                    this.formGds.infoConection.Text = "Cliente conectado";
 
                 });
 
-                client.Value.SendQueryRequest10(
-                    "SELECT * FROM multi_event LIMIT 10", ConsistencyType.NONE, 10000L
-                    );
+
             }
 
             public override void OnDisconnect()
@@ -89,9 +83,9 @@ namespace GDSExtractor
                         this.formGds.infoConection.Text = message;
 
                     });
-                   
-                   // client.Value.Close();
-                  //  countdown.Signal();
+
+                    // client.Value.Close();
+                    //  countdown.Signal();
                     return;
                 }
 
@@ -136,7 +130,22 @@ namespace GDSExtractor
                     if (attachment == null)
                     {
                         //if you requested the binary, the attachment will be sent as an 'attachment response' type message at a later time
+                        //si su solicitud aun no esta lista, el adjunto se enviará como un mensaje de tipo 'respuesta de adjunto' en un momento posterior
+                        //en el metodo OnAttachmentResponse6
                     }
+                    else
+                    {
+
+                        string attachmentId = data.AckData.Result.AttachmentId;
+
+                        string event_id = data.AckData.Result.OwnerIds[0];
+
+                        WriteAttachment(attachment, attachmentId, event_id);
+                    }
+
+
+
+
                 }
             }
 
@@ -148,26 +157,14 @@ namespace GDSExtractor
             {
                 //Para saber a que adjunto corresponde la respuesta, se puede obtener el messageID del header
                 //Este fue el que nosotros generamos al solicitar el adjunto
-                string messageID = header.MessageId;
+
                 byte[] attachment = data.Result.Attachment;
 
                 //enviar adjunto a transito app
                 if (attachment != null)
                 {
-                    //descargar el archivo
-                    string path = Path.Combine("C:\\images_gds\\", messageID + ".jpg");
-
-
-                    File.WriteAllBytes(path, attachment);
-                    //enviar a transito app
-                    //this.formGds.Invoke((MethodInvoker)delegate
-                    //{
-                    //    this.formGds.labelInfoRow.Text = "Sending
-
-
-
+                    WriteAttachment(attachment, data.Result.AttachmentId, data.Result.OwnerIds[0]);
                 }
-
 
                 //Una vez recibido el adjunto, debemos informar a GDS que lo recibimos correctamente
                 //De lo contrario, GDS lo volverá a enviar indefinidamente
@@ -180,6 +177,7 @@ namespace GDSExtractor
                             )
                         )
                     );
+
             }
 
 
@@ -193,7 +191,7 @@ namespace GDSExtractor
                 //Los adjuntos se solicitan por separado estan el poción de 9 en foma de array
                 //tambien parecen ser 3,tambien en la 91
                 //viene como object
-                
+
                 object[] adjuntos = record[91] as object[];
 
 
@@ -217,7 +215,7 @@ namespace GDSExtractor
                     date = record[5]?.ToString(),
                     camera_serial = record[119]?.ToString(), //entry_device_id
                     resultado = "OK",
-                    data=messageID,
+                    data = messageID,
                     attachments = JsonConvert.SerializeObject(record[91])
 
                 };
@@ -230,7 +228,7 @@ namespace GDSExtractor
                 //se agrega a la lista de deis  en la tabla de la interfaz
                 this.formGds.Invoke((MethodInvoker)delegate
                 {
-                   int index =  this.formGds.dataGridDeis.Rows.Add(dei.id, dei.license_plate, dei.date, dei.max_speed, dei.license_plate, dei.resultado, messageID, dei.attachments);
+                    int index = this.formGds.dataGridDeis.Rows.Add(dei.id, dei.license_plate, dei.date, dei.max_speed, dei.license_plate, dei.resultado, messageID, dei.attachments);
 
 
                     if (adjuntos != null)
@@ -243,21 +241,21 @@ namespace GDSExtractor
                                 var message = "Getting Attahcments .." + adjuntoId + " " + messageID;
 
                             });
-                            getAttachment(dei.id, messageID);
+                            getAttachment(adjuntoId, dei.id);
                         }
                     }
 
-                   // getAttachment(dei.id, messageID);
+                    // getAttachment(dei.id, messageID);
 
 
-                    
+
 
                 });
 
 
                 ////crear la dei en transito app sin las imagenes
                 ///
-                
+
 
 
 
@@ -271,7 +269,7 @@ namespace GDSExtractor
                 //    this.formGds.labelInfoRow.Text = message;
 
                 //});
-                
+
 
 
 
@@ -283,10 +281,10 @@ namespace GDSExtractor
             /**
              * obtenr adjuntos
              */
-            public void getAttachment(string recordId, string messageID)
+            public void getAttachment(string attachmentId, string eventId)
             {
                 //enviar la consulta de los adjuntos
-                client.Value.SendAttachmentRequest4("SELECT * FROM \"multi_event-@attachment\" WHERE id='" + recordId + "' FOR UPDATE WAIT 86400", messageID);
+                client.Value.SendAttachmentRequest4("SELECT * FROM \"multi_event-@attachment\" WHERE id='" + attachmentId + "' and ownerid='" + eventId + "' FOR UPDATE WAIT 86400");
 
             }
 
@@ -325,7 +323,37 @@ namespace GDSExtractor
                 }
             }
 
+            private void WriteAttachment(byte[] attachment, string attachmentId, string event_id)
+            {
+
+                //descargar el archivo
+                string path = Path.Combine("C:\\images_gds\\", event_id + "___" + attachmentId + ".jpg");
+
+
+                File.WriteAllBytes(path, attachment);
+            }
+
+
+            public string GetEvents(string start_date, string end_date, int limit)
+            {
+
+                //si no existe el cliente, no hacer nada
+                if (!client.Value.IsConnected)
+                {
+                    return "Cliente no conectado";
+                }
+
+                string query = "SELECT * FROM multi_event LIMIT " + limit;
+
+                client.Value.SendQueryRequest10(query, ConsistencyType.NONE, 10000L);
+
+                return "Consulta enviada";
+            }
+
         }
+
+
+
 
 
     }
