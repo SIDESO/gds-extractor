@@ -6,14 +6,17 @@ namespace GDSExtractor
 {
     public partial class FormGds : Form
     {
+        readonly string uri = "ws://127.0.0.1:8888/gate";
+        public string userName = "developer";
 
         string[] args;
         string accessToken;
         string endPoint;
         string subjectName;
-        string issuerName;
+
         string command;
         string url;
+
         private TestListener listener;
 
         //get endpoint
@@ -31,6 +34,7 @@ namespace GDSExtractor
 
         public FormGds()
         {
+
             args = Environment.GetCommandLineArgs();
 
             InitializeComponent();
@@ -70,21 +74,26 @@ namespace GDSExtractor
 
             }
 
+            ConnectClient();
 
+        }
+
+        /**
+         * crear y conetra con el GDS una instancia de AsyncGDSClient
+         */
+        private void ConnectClient()
+        {
             Reference<AsyncGDSClient> clientRef = new Reference<AsyncGDSClient>(null);
             listener = new TestListener(clientRef, this);
             AsyncGDSClient client = AsyncGDSClient.GetBuilder()
                 .WithListener(listener)
                 .WithTimeout(10000)
-                .WithUserName("developer")
-                .WithURI("ws://127.0.0.1:8888/gate")
+                .WithUserName(this.userName)
+                .WithURI(this.uri)
                 .WithPingPongInterval(10000)
                 .Build();
             clientRef.Value = client;
-
             client.Connect();
-
-            //countdown.Wait();
         }
 
         /**

@@ -25,6 +25,8 @@ namespace GDSExtractor
         {
             private readonly Reference<AsyncGDSClient> client;
 
+            private string userName;
+
             FormGds formGds;
 
             List<Dei> list_deis = new List<Dei>();
@@ -33,6 +35,7 @@ namespace GDSExtractor
             {
                 this.client = client;
                 this.formGds = formGds;
+                this.userName = formGds.userName;
             }
 
 
@@ -109,7 +112,7 @@ namespace GDSExtractor
                 if (data.AckData.HasMorePage)
                 {
                     client.Value.SendMessage(
-                       MessageManager.GetHeader("user", DataType.NextQueryPageRequest),
+                       MessageManager.GetHeader(this.userName, DataType.NextQueryPageRequest),
                        MessageManager.GetNextQueryPageRequest(data.AckData.QueryContextDescriptor, 10000L)
                    );
                 }
@@ -185,38 +188,68 @@ namespace GDSExtractor
             private void processDataTapp(List<object> record)
             {
 
-                //darle un uuid para el mensaje
-                string messageID = Guid.NewGuid().ToString();
+                string id = "";
+                string plate = "";
+                string date = "";
+                string max_speed = "";
+                string serial = "";
+                string data = "";
+                string resultado = "OK";
+                string attachments_str = "";
+                object[] attachments = null;
 
-                //Los adjuntos se solicitan por separado estan el poción de 9 en foma de array
-                //tambien parecen ser 3,tambien en la 91
-                //viene como object
 
-                object[] adjuntos = record[91] as object[];
+                //los valores de los campos cambian de acuerdo al usuario
+                if (this.userName == "developer")
+                {
+                    //developer
+                    //id 51
+                    //atachments 71
+                    //camara 99
+                    //speed 101- 105
+                    //fecha 0 viene en formato timestamp
+                    id = record[51]?.ToString();
+                    plate = record[105]?.ToString();
+                    date = record[0]?.ToString();
+                    max_speed = record[101]?.ToString();
+                    serial = record[99]?.ToString();
+                    attachments_str = JsonConvert.SerializeObject(record[71]);
+                    attachments = record[71] as object[];
 
+                }
 
+                if (this.userName == "admin")
+                {
+                    //adjuntos tambien parecen ser 3,tambien en la 91
+                    //fecha 5
+                    //id 71
+                    //placa 98
+                    //velocida  121
+                    //camara 119
 
-                //Los adjuntos se solicitan por separado estan el poción de 72 en foma de array
+                    id = record[71]?.ToString();
+                    plate = record[98]?.ToString();
+                    date = record[5]?.ToString();
+                    max_speed = record[121]?.ToString();
+                    serial = record[119]?.ToString();
+                    attachments_str = JsonConvert.SerializeObject(record[91]);
+                    attachments = record[91] as object[];
 
-                //fecha 5
-                //id 71
-                //placa 98
-                //velocida  121
-                //camara 119
+                }
 
 
 
                 //crear la data que se va a enviar a transito app
                 Dei dei = new Dei
                 {
-                    id = record[71]?.ToString(),
-                    license_plate = record[98]?.ToString(), //plate
-                    max_speed = record[121]?.ToString(), //average_speed
-                    date = record[5]?.ToString(),
-                    camera_serial = record[119]?.ToString(), //entry_device_id
+                    id = id,
+                    license_plate = plate,
+                    max_speed = max_speed, //average_speed
+                    date = date,
+                    camera_serial = serial, //entry_device_id
                     resultado = "OK",
-                    data = messageID,
-                    attachments = JsonConvert.SerializeObject(record[91])
+                    data = "",
+                    attachments = attachments_str
 
                 };
 
@@ -231,14 +264,14 @@ namespace GDSExtractor
                     int index = this.formGds.dataGridDeis.Rows.Add(dei.id, dei.license_plate, dei.date, dei.max_speed, dei.license_plate, dei.resultado, messageID, dei.attachments);
 
 
-                    if (adjuntos != null)
+                    if (attachments != null)
                     {
-                        foreach (var adjunto in adjuntos)
+                        foreach (var adjunto in attachments)
                         {
                             var adjuntoId = adjunto.ToString();
                             this.formGds.Invoke((MethodInvoker)delegate
                             {
-                                var message = "Getting Attahcments .." + adjuntoId + " " + messageID;
+                                var message = "Getting Attahcments .." + adjuntoId + " ";
 
                             });
                             getAttachment(adjuntoId, dei.id);
@@ -284,7 +317,9 @@ namespace GDSExtractor
             public void getAttachment(string attachmentId, string eventId)
             {
                 //enviar la consulta de los adjuntos
-                client.Value.SendAttachmentRequest4("SELECT * FROM \"multi_event-@attachment\" WHERE id='" + attachmentId + "' and ownerid='" + eventId + "' FOR UPDATE WAIT 86400");
+                string query = "SELECT * FROM \"multi_event-@attachment\" WHERE id='" + attachmentId + "' and ownerid='" + eventId + "' FOR UPDATE WAIT 86400";
+
+                client.Value.SendAttachmentRequest4("query");
 
             }
 

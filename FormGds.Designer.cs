@@ -203,7 +203,6 @@ namespace GDSExtractor
             dataGridDeis.Location = new Point(3, 3);
             dataGridDeis.Name = "dataGridDeis";
             dataGridDeis.RowHeadersWidth = 51;
-            dataGridDeis.ScrollBars = ScrollBars.Vertical;
             dataGridDeis.Size = new Size(1374, 462);
             dataGridDeis.TabIndex = 0;
             // 
